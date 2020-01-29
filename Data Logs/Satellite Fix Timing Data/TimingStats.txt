@@ -1,0 +1,57 @@
+Overall Statistics : 
+Mean: 6.9986s
+Std: 18.5047s
+Min: 0.0563s
+Max: 144.8812s
+
+Verification Statistics : 
+
+First Fix - GPS Listener : 
+Mean: 3.5100s
+Std: 9.1364s
+Min: 0.0563s
+Max: 106.4377s
+
+First Loc - Location Manager On Location Changed : 
+Mean: 3.2050s
+Std: 8.3520s
+Min: 0.0128s
+Max: 106.3961s
+
+File by file stats: 
+
+TimingLog-AuntHouse.txt
+Mean: 2.6559s
+Std: 1.3031s
+Min: 0.0563s
+Max: 5.4853s
+
+TimingLog-BackDeck.txt
+Mean: 2.4103s
+Std: 1.4332s
+Min: 0.0891s
+Max: 5.1191s
+
+TimingLog-Commute.txt
+Mean: 13.3221s
+Std: 28.4880s
+Min: 0.0907s
+Max: 106.4377s
+
+TimingLog-Desk.txt
+Mean: 4.9536s
+Std: 7.3711s
+Min: 1.0277s
+Max: 39.1226s
+
+TimingLog-Desk2.txt
+Mean: 26.8219s
+Std: 39.5361s
+Min: 1.8335s
+Max: 144.8812s
+
+TimingLog-Desk3.txt
+Mean: 2.3964s
+Std: 2.4340s
+Min: 0.2035s
+Max: 13.7503s

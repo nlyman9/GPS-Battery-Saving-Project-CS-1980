@@ -1,0 +1,17 @@
+Scenario: walk
+Speed (Avg/Min/Max): 3.5/2/5 m/s
+Average Distance: 58 m
+READY_TIME == 3
+READY_PWR == 2
+PWR_USAGE == 5
+Starting simulation...
+At 1 seconds the GPS began turning on.
+At 4 seconds the GPS acquired a signal.
+At 5 seconds the GPS turned off.
+At 16 seconds the GPS began turning on.
+At 19 seconds the GPS acquired a signal.
+At 20 seconds the GPS turned off.
+At 176 seconds the GPS began turning on.
+End of simulation.
+Total Time: 177 seconds.
+Total Power Used: 16 units.

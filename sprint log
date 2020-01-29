@@ -1,0 +1,58 @@
+9/20/2019 - 9/27/2019 (Matthew Borbonus)
+---------------------
+*Have Dr. Mosse send us the simulator and review its functionality
+*Create a basic "hello world" Android application to get a base to work off of
+*Research how we can modulate the power state of the GPS device
+
+REVIEW:
+Dr. Mosse did not return our email and thus we were unable to look over the simulator, another email will be sent
+A basic Android application was made to get a base layer to work with
+Initial research into how to modulate the power state of the GPS was done and according to what we could find it seems rather hacky and differs between Android versions, some implementations we saw even had to use an exploit which has since been patched
+
+9/27/2019 - 10/4/2019 (Stephen Marhefka)
+---------------------
+*Send another email to Dr. Mosse requesting to get a copy of the simulator sent to us
+*Attempt to add functionality to the app that utilizes the code we were able to find that will power cycle the GPS
+*Research how to monitor power consumption on an Android device
+
+REVIEW:
+Met with Dr. Mosse 10/3/2019, he was able to send us the code from the previous capstone course that we will begin reviewing shortly to get an insight into the algorithms and simulator that has already been put in place
+While at the meeting he also gave us a test Android phone that will be rooted to more easily test our implementation
+We were both very busy will projects from other courses so not much was accomplished this past week, we will be ramping up this coming sprint
+
+10/4/2019 - 10/11/2019 (Matthew Borbonus)
+----------------------
+*Attempting to finally seize control of the GPS on the newly acquired rooted Android device
+*Possibly have a map loaded onto the application to provide a functional demo
+*Review the code and simulator sent to us to get an idea of what we are working with, what we can improve upon, and look into porting this code to the Android application in the future
+
+REVIEW:
+Succesfully obtained control of the GPS unit and can be toggled in the application
+Reviewed simulator to learn how it worked and what conditions it was testing (proved to not be very useful in our algorithm)
+
+10/11/2019 - 10/18/2019 (Stephen Marhefka)
+-----------------------
+*Porting some of the components of the simulator/developing our own portions of the algorithm
+*Add map to our Android app along with obtaining users current location and speed
+*Meet with Dr. Mosse on 10/17/2019 to review progress & issues
+
+REVIEW:
+Map screen was added to app as well as getting the user's location and speed
+Meeting with Dr. Mosse went okay, he sent us some graphs and additional data produced by the students who made the simulator
+
+10/18/2019 - 10/25/2019 (Matthew Borbonus)
+-----------------------
+* Obtaining/arranging the chance to acquire a power meter to measure the power consumption of the GPS components
+* Write Midterm paper
+* Create and rehearse Midterm presentation
+* Investigate GPS navigation and see if we can obtain the distance between each turn that the user makes
+
+REVIEW:
+Obtained the power meter on the 24th, not entirely sure how to interpret its data fully
+Midterm presentation and paper went well, Luis seemed pleased with our progress and presentation
+
+10/25/2019 - 11/1/2019 (Stephen Marhefka)
+----------------------
+*Get preliminary power measurements with GPS on and off
+*Calculate distance between users current location and a set location
+*Determine estimated amount of time required to reach destination from curreltn location

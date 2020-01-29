@@ -1,0 +1,21 @@
+(must be in directory of adb)
+1. 'adb shell' (starts adb)
+2. 'su' (gives root access)
+3. 'cp data/data/com.gps.gpsoptimizationproject/files/GPSLog.txt storage/emulated/legacy' (moves log file to accessible location)
+4. Enter Ctrl-D TWICE (exits su then exits adb)
+5. 'adb pull storage/emulated/legacy/GPSLog.txt' (pulls file to active directory)
+
+GPSLog.txt format
+CUR_LOC |timestamp | battery_level | latitude | longitude | speed | distance to next waypoint
+ETAOFF |timestamp | time to next waypoint in seconds |  battery_level  (time = infinity if speed = 0)
+GPS_OFF | timestamp |  battery_level
+GPS_ON | timestamp |  battery_level
+LOC_OFF | timestamp |  battery_level| latitude | longitude 
+LOC_OFF| latitude | longitude |timestamp (deprecated "old loc_off" comment in code)
+LOC_ON | timestamp | battery_level | 40.44375634 | -79.95357708 | 
+MISSED_POINT | timestamp |  battery_level | distance to missed waypoint| latitude | longitude
+NAV_START |timestamp |  battery_level
+NAV_STOP (MANUAL) | timestamp |  battery_level
+NAV_STOP (FINAL_DEST) | timestamp |  battery_level
+GPS_NOT_OFF (STD_MISSED) | timestamp |  -predicted GPS_turn_off time | battery_level
+GPS_NOT_OFF (NO_POWER_SAVED) | timestamp |  -predicted GPS_turn_off time | battery_level

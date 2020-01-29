@@ -1,0 +1,4 @@
+Investigate how/if we can control a devices GPS unit on Android (partially done)
+Look into monitoring of device/process energy usage
+Modify our Android application to test GPS device togglability
+Have Dr. Mosse send the simulator to us and look over how it works/what it can do

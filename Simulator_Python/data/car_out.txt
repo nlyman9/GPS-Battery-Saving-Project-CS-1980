@@ -1,0 +1,14 @@
+Scenario: car
+Speed (Avg/Min/Max): 38.5/32/45 m/s
+Average Distance: 743 m
+READY_TIME == 3
+READY_PWR == 2
+PWR_USAGE == 5
+Starting simulation...
+At 1 seconds the GPS began turning on.
+At 4 seconds the GPS acquired a signal.
+At 6 seconds the GPS turned off.
+At 22 seconds the GPS began turning on.
+End of simulation.
+Total Time: 24 seconds.
+Total Power Used: 14 units.

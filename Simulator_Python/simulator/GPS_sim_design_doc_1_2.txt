@@ -1,0 +1,40 @@
+Purpose: To determine if our algorithm can theoretically save power and, if so, how much and whether there any patterns in the amount between scenarios.
+
+Objects:
+User: Tracks the user's x-y position, speed, and direction.
+GPS: Tracks whether the GPS is on, the location it reports, the time it takes to turn on and acquire a signal, the power required to turn on and acquire signal, and the power consumed when acquiring a location update.
+Scenario: Contains a header containing information about the scenario and a list of key points. (see Inputs).
+
+Inputs:
+A scenario file (in .txt format for simplicity).
+Each scenario file should contain the following:
+The first line should always be the header. Ex: [<scenario name>, <avg speed>, <min spd>, <max spd>, <avg distance>]
+Each line after the first represents a key point along the route (i.e. where turns occur).
+Key points should be formated like: [<(x, y)>, <(angle, UorD, RorL)>]
+The first point should always start at (0, 0).
+Angle should be between 0 (completely horizontal) and 90 (completely vertical).
+UorD is 1 if deltaY > 0 and -1 if deltaY < 0. It is unused if deltaY == 0.
+RorL is 1 if deltaX > 0 and -1 if delta < 0. It is unused if deltaX == 0.
+The simulator will use avg speed, min spd, and max spd to generate speed values and append them to the key points before the simulation starts.
+
+Optionally, an output file can also be supplied.
+
+
+IMPORTANT: Note how the header and key points are contained in []. This NEEDS to be the case in the file so that they can be read in as Python lists. Similarly, values inside () must be enclosed in () in the file.
+
+Algorithm:
+A margin of error is calculated for each portion of the route based the user's speed. The purpose of the margin of error is determine when the GPS needs to be turned on and represents a certain distance from the next key point. Once the user has passed into the margin of error, the GPS begins to turn on. This distance is calculated using the distance the user covers during the time the GPS is getting ready, as determined by the user's speed and the time it takes for the GPS to be ready, and the distance the user travels in one second. The distance of the margin of error can be extended using and adjustment value that determines how many multiples of the user's speed to use when calculating the distance. The current implementation uses an adjustment of 2. The higher the adjustment value, the more accurate the GPS will be overall, but more power will be used. On the converse, if a lower value is used, less power will be used, but the GPS may not have an acceptable level of accuracy.
+
+Outputs:
+Header data.
+Timestamps for when the GPS's status changed.
+If the -d flag is used, the user's location, the gps's reported location, and next key point after every iteration.
+The total power consumed.
+The time the scenario took.
+
+Assumptions:
+The user travels in a straight line between points, so the turns need to be reasonable.
+The time to acquire signal and the power consumed doing so is constant.
+Once the signal is acquired, updating the location is instant/takes less than one second.
+Updating the gps location always takes the same amount of power.
+Speed is in meters per second and distances are in meters. (i.e. the distance between (0, 0) and (1, 1) is sqrt(2) meters)

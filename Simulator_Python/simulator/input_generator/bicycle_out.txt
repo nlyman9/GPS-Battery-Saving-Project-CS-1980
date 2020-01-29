@@ -1,0 +1,12 @@
+Scenario: bicycle
+Speed (Avg/Min/Max): 9.5/7/12 m/s
+Average Distance: 155 m
+READY_TIME == 3
+READY_PWR == 2
+PWR_USAGE == 5
+Starting simulation...
+At 1 seconds the GPS began turning on.
+At 4 seconds the GPS acquired a signal.
+End of simulation.
+Total Time: 4 seconds.
+Total Power Used: 2 units.

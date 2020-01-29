@@ -1,0 +1,15 @@
+1. First, be sure the phone is running Android Lollipop (5.x). If not, the rooting application we used to root the phones will not work.
+2. Go to an internet browser on the phone and go to 'https://kingrootapp.net/'. Download the APK, install it, and give it any permissions it needs (just say yes--very safe)
+3. Once installed, open KingRoot and press on the Root button
+4. If the previous step succeeds, the phone has been successfully rooted; if not, repeat until it works.
+5. Go the Google Play Store and search for an application called 'Link2SD' and install it with any permissions it needs
+6. The last thing needed to prep the device is to go to Settings>Developer Settings and enable USB Debugging
+7. After this, simply connecting the phone to your development computer and accepting the one screen pop up will allow the Android Studio to install the application onto the phone
+  7.1 install Android Studio
+  7.2 connect phone, accept RSA key
+  7.3 observe that device is LGE Nexus 5 (drop down top middle)
+  7.4 To install, simply press the green play button in the top of bar of Android Studio to build and install the application
+      onto the phone
+8. Once installed, open Link2SD, find the application you installed [GPS Optim_Project in this case], select it, press the 3 bars in the top right corner of the screen and select 'Convert to system app' (see IMPORTANT step 9; see IMPORTANT step 10) 
+9. Any future installs of the application will require you to open Link2SD, select the application, open the menu like before, and select 'Integrate update into system'; if not, you will lose the changes.
+10. If using a different computer, use LINK2SD to uninstall app (GPS Optim) before you install the new app with Android Studio (to renew the RSA key).

@@ -1,0 +1,8 @@
+The simulator is run from commandline. Type "python gps_sim.py -f <input filename>" where <input filename> is the filename of the input file being used (include the file extension). There are several optional flags that can be used.
+-d: Detailed output - Prints the user's location, the gps's reported location, and the next point after every iteration.
+
+-o <filename> (do NOT include extension): Creates/opens <filename>.txt and writes output to the file. Data in the file will be overwritten if the file already exists.
+
+-n <n>: Repeat the scenario n times.
+
+Included in this folder are several example input files and their corresponding output files.
