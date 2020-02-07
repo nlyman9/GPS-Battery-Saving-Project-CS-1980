@@ -620,7 +620,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             staticRoute.add(six);
         } else if(user.equals("matt")) {
             //Detect if it's the T
-            if(GlobalVars.Transportation == "T") {
+            if(MainActivity.Transportation == "T") {
                 //Mcneilly
                 Location one = new Location("");
                 one.setLatitude(40.378012);
@@ -693,7 +693,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 staticRoute.add(ten);
                 staticRoute.add(eleven);
                 staticRoute.add(twelve);
-            } else if(GlobalVars.Transportation == "61") {
+            } else if(MainActivity.Transportation == "61") {
                 //Fifth and Sixth Avenue
                 Location one = new Location("");
                 one.setLatitude(40.438941);
@@ -725,7 +725,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 staticRoute.add(four);
                 staticRoute.add(five);
                 staticRoute.add(six);
-            } else if(GlobalVars.Transportation == "71") {
+            } else if(MainActivity.Transportation == "71") {
                 //Fifth and Sixth Avenue
                 Location one = new Location("");
                 one.setLatitude(40.438941);
@@ -1098,7 +1098,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             staticRoute.add(five);
             staticRoute.add(six);
         } else if(user.equals("matt")) {
-            if(GlobalVars.Transportation == "T") {
+            if(MainActivity.Transportation == "T") {
                 //Crossing the River
                 Location one = new Location("");
                 one.setLatitude(40.431541);
@@ -1170,7 +1170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 staticRoute.add(ten);
                 staticRoute.add(eleven);
                 staticRoute.add(twelve);
-            } else if(GlobalVars.Transportation == "Bus") {
+            } else if(MainActivity.Transportation == "Bus") {
                 //First - Fifth and Atwood
                 Location one = new Location("");
                 one.setLatitude(40.441770);
@@ -1213,7 +1213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 staticRoute.add(six);
                 staticRoute.add(seven);
             }
-            else if(GlobalVars.Transportation == "Car1"){
+            else if(MainActivity.Transportation == "Car1"){
                 //Wabash
                 Location one = new Location("");
                 one.setLatitude(40.372869);

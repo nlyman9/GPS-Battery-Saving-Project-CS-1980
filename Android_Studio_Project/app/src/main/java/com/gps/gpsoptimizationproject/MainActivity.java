@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     static String beforeEnable;
     static TextView MainText;
     static TextView GPSText;
+    static String Transportation;
     static boolean route = false;
     // provides buttons for Matt route select
     final static boolean Matt = true;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         pitt.setOnClickListener(new View.OnClickListener() {
             @Override
            public void onClick(View v) {
-                GlobalVars.Transportation = "T";
+                Transportation = "T";
                 route = false;
                 moveToMapActivity();
            }
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GlobalVars.Transportation = "T";
+                Transportation = "T";
                 route = true;
                 moveToMapActivity();
             }
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         pitt61.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GlobalVars.Transportation = "61";
+                Transportation = "61";
                 route = false;
                 moveToMapActivity();
             }
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         pitt71.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GlobalVars.Transportation = "71";
+                Transportation = "71";
                 route = false;
                 moveToMapActivity();
             }
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         homebus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GlobalVars.Transportation = "Bus";
+                Transportation = "Bus";
                 route = true;
                 moveToMapActivity();
             }
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         customButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GlobalVars.Transportation = "Car1";
+                Transportation = "Car1";
                 route = true;
                 moveToMapActivity();
             }

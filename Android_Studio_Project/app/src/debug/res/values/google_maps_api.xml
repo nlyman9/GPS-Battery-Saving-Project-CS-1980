@@ -22,5 +22,5 @@
     -->
     <!--Notes from Matt- the api key is under my personal Google Account. I have removed my API key to prevent any future issues.
     Follow the above instructions to get your own-->
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"></string>
+    <string name="AIzaSyD7wmMHO3j0AVUecY6iz_JCM_KPRaFyPLI" templateMergeStrategy="preserve" translatable="false"></string>
 </resources>
