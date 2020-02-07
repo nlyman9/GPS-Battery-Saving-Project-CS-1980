@@ -127,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Transportation = "Car1";
+                Transportation = "Car1";
+                Transportation = "Car1";
                 route = true;
                 moveToMapActivity();
             }

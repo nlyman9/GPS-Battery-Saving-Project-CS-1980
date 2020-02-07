@@ -39,7 +39,7 @@
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyD7wmMHO3j0AVUecY6iz_JCM_KPRaFyPLI" />
+            android:value="google_maps_key" />
     </application>
     <permission
         android:name="com.gps.gpsoptimizationproject.permission.MAPS_RECEIVE"
