@@ -1,10 +1,17 @@
 package com.gps.gpsoptimizationproject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -13,6 +20,7 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,12 +32,36 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.mapquest.navigation.NavigationManager;
+import com.mapquest.navigation.dataclient.RouteService;
+import com.mapquest.navigation.location.LocationProviderAdapter;
+import com.mapquest.navigation.model.Shape;
+import com.mapquest.navigation.model.location.Destination;
+
+import com.mapquest.navigation.NavigationManager;
+import com.mapquest.navigation.dataclient.RouteService;
+import com.mapquest.navigation.dataclient.listener.RoutesResponseListener;
+import com.mapquest.navigation.location.LocationProviderAdapter;
+import com.mapquest.navigation.model.RouteOptionType;
+import com.mapquest.navigation.model.SystemOfMeasurement;
+import com.mapquest.navigation.model.location.Coordinate;
+import com.mapquest.navigation.model.Route;
+import com.mapquest.navigation.model.RouteLeg;
+import com.mapquest.navigation.model.RouteOptions;
+import com.mapquest.navigation.model.location.Destination;
+
+import android.app.Application;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     //Standard deviation of time to get GPS fix
@@ -37,6 +69,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //This is the amount of time the GPS needs to be off before we save power
     final float POWERSAVINGSTIME = 10f;
     final float RADIUS = 80;
+
+    //Permission int for location
+    private static final int LOCATION_REQUEST = 1400;
 
     //specifies who the route is going to be created for (Stephen, Matt, Mosse, driver, test)
     final String user = "matt";
@@ -49,11 +84,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView velocitydisplay, distancedisplay, timedisplay;
     // current point in list
     Location destination;
+    //MapQuest Variables
+    LocationProviderAdapter mLocationProviderAdapter;
+    RouteService mRouteService;
+    NavigationManager mNavigationManager;
+    List<Destination> dest = new ArrayList<>();
+
     // used to calculate distance from GPS turning on to previous point
     Location previous = new Location("");
     // used to set if we are only logging or modulating
     boolean logging = false;
     ArrayList<Location> staticRoute;
+    ArrayList<Location> dynamicRoute;
     int ListI = 0;
     boolean navigation = false, logGPSOnLatLng = false, testOvershot = false, firstOvershot=false;
     Marker destMarker;
@@ -65,11 +107,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     float firstDistance;
     // object used to get battery level
     BatteryManager bm;
+    private static final String TAG = "MyActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //check if we have location permissions
+        if (!canAccessLocation()) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST);
+        }
+        //System.out.println("Entered Maps Activity Successfully");
         currentLocation.setLongitude(50);
         currentLocation.setLatitude(-80);
 
@@ -78,6 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         velocitydisplay = findViewById(R.id.VelocityView);
         distancedisplay = findViewById(R.id.DistanceView);
         timedisplay = findViewById(R.id.TimeView);
+
 
         try {
             logfile = new File(getApplicationContext().getFilesDir() + "/GPSLog.txt");
@@ -180,6 +228,71 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         };
+
+        startMapQuestNavigation();
+    }
+
+    private void startMapQuestNavigation() {
+        //Boilerplate Objects
+        mRouteService = new RouteService.Builder().build(getApplicationContext(), BuildConfig.API_KEY);
+        mLocationProviderAdapter = ((MQNavigationSampleApplication) getApplication()).getLocationProviderAdapter();
+        //mNavigationManager = new NavigationManager.Builder(this, BuildConfig.API_KEY, mLocationProviderAdapter).build();
+
+        // Set up start and destination for the route
+        //TODO convert the start coordinate to a current location access
+        Coordinate nyc = new Coordinate(40.7326808, -73.9843407);
+        Coordinate boston = new Coordinate(42.355097, -71.055464);
+        dest.add(new Destination(boston, null));
+
+        // Set up route options
+        RouteOptions routeOptions = new RouteOptions.Builder()
+                .maxRoutes(3)
+                .systemOfMeasurementForDisplayText(SystemOfMeasurement.UNITED_STATES_CUSTOMARY) // or specify METRIC
+                .language("en_US") // NOTE: alternately, specify "es_US" for Spanish in the US
+                .highways(RouteOptionType.ALLOW)
+                .tolls(RouteOptionType.ALLOW)
+                .ferries(RouteOptionType.DISALLOW)
+                .internationalBorders(RouteOptionType.DISALLOW)
+                .unpaved(RouteOptionType.DISALLOW)
+                .seasonalClosures(RouteOptionType.AVOID)
+                .build();
+        RoutesResponseListener responseListener = new RoutesResponseListener() {
+            @Override
+            public void onRoutesRetrieved(@NonNull List<Route> routes) {
+                if (routes.size() > 0) {
+                    //mNavigationManager.startNavigation((Route) routes.get(0));
+                    Route mRoute = routes.get(0);
+                    List<RouteLeg> legs = mRoute.getLegs();
+                    //System.out.println("Length of legs: " + legs.size());
+                    RouteLeg onlyLeg = legs.get(0);
+                    Shape s = onlyLeg.getShape();
+                    List<Coordinate> coords = s.getCoordinates();
+                    int count = 0;
+                    // Print out the list of coordinates for the route from nyc to boston.
+                    // Almost 4,000(!!!) coordinates returned from this
+                    // It does not return a coordinate for each turn, clearly
+                    for (Coordinate coord : coords) {
+                        System.out.println("Coord: " + count);
+                        System.out.println("Latitude: " + coord.getLatitude());
+                        System.out.println("Longitude: " + coord.getLongitude());
+                        count++;
+                    }
+                }
+            }
+
+            @Override
+            public void onRequestFailed(@Nullable Integer integer, @Nullable IOException e) {
+
+            }
+
+            @Override
+            public void onRequestMade() {
+
+            }
+        };
+        mRouteService.requestRoutes(nyc, dest, routeOptions, responseListener);
+
+
     }
 
     //creates route to Pitt
@@ -1672,4 +1785,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Now to get the user's live speed
     }
 
+    /**
+     * Evaluate whether we have access to the user's location
+     * @return true if we have permission to access the user's location, false if we don't
+     */
+    public boolean canAccessLocation() {
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case LOCATION_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //permission was granted by the user
+                    Toast.makeText(this, "Permission was granted", Toast.LENGTH_LONG).show();
+                } else {
+                    //permission was denied by the user
+                    Toast.makeText(this, "Permission was denied. Can't get routes", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
 }
