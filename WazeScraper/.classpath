@@ -3,5 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/ozuru/Documents/School/CS1980/GPS-Battery-Saving-Project-CS-1980/WazeScraper/jsoup-1.13.1.jar"/>
+	<classpathentry kind="lib" path="/Users/ozuru/Documents/School/CS1980/GPS-Battery-Saving-Project-CS-1980/WazeScraper/gson-2.6.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
