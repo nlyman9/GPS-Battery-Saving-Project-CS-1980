@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     static TextView MainText;
     static TextView GPSText;
     static String Transportation;
+    static boolean WazeMode = false;
     static boolean route = false;
     // provides buttons for Matt route select
     final static boolean Matt = true;
@@ -61,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
         Button homebus = findViewById(R.id.homebus);
         Button customButton = findViewById(R.id.customButton);
 
+        // Waze mode variables
+        Button wazeButton = findViewById(R.id.wazeButton);
+        TextView wazeModeStatus = (TextView) findViewById(R.id.wazeModeStatus);
+
+
         gpsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +80,21 @@ public class MainActivity extends AppCompatActivity {
                     gpsIndicator.setText("GPS OFF");
                     turnGPSOff(getApplicationContext());
                 }
+            }
+        });
+
+        // Toggle Waze status.
+        wazeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WazeMode = !WazeMode;
+                if (WazeMode){
+                    wazeModeStatus.setText("Waze Mode: on");
+
+                }  else {
+                    wazeModeStatus.setText("Waze Mode: off");
+                }
+
             }
         });
 

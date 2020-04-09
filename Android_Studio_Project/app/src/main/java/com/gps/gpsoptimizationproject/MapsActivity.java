@@ -134,7 +134,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         distanceDisplay = findViewById(R.id.DistanceView);
         timeDisplay = findViewById(R.id.TimeView);
 
-
         try {
             logfile = new File(getApplicationContext().getFilesDir() + "/GPSLog.txt");
             loggingFileOutputStream = new FileOutputStream(logfile, true);
@@ -1477,6 +1476,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return 0f;
     }
 
+    private float calculateTravelTime(Location currentLoc, Location currentDestination, float currentSpeed) {
+        if (MainActivity.WazeMode) {
+            // Calculate using waze.
+            return 0f;
+        } else {
+            // We aren't in Waze mode, so use distance divided by speed.
+            return (calcDistance(currentLoc, currentDestination) - ACCEPTABLE_DISTANCE_RADIUS) / currentSpeed;
+        }
+    }
+
     /**
      * This function creates a location listener that enables us to perform events on location
      * changes.
@@ -1504,10 +1513,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // Update our display with the current speed.
                     velocityDisplay.setText(location.getSpeed() + " m/s");
 
-                    // If we are currently in navigation mode, calculate distance to the next destination
+                    // If we are currently in navigation mode, calculate distance to the next destination.
                     if(isInNavigationMode) {
-                        float time = calcDistance(location, currentDestination) / location.getSpeed();
-                        timeDisplay.setText(time + "s");
+                        float timeToDestination = calculateTravelTime(location, currentDestination, location.getSpeed());
+                        timeDisplay.setText(timeToDestination + "s");
                         try {
                             Date now = new Date();
                             int batLevel = getBatteryLevel();
@@ -1531,9 +1540,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         // We have reached our destination, so set a new destination.
                         if(setNextDestination()) {
                             // Calculate travel time to the new destination
-                            // TODO: Plug in Waze right here
-                            float travelTimeToNextDestination;
-                            travelTimeToNextDestination = (calcDistance(location, currentDestination) - ACCEPTABLE_DISTANCE_RADIUS) / location.getSpeed();
+                            float travelTimeToNextDestination = calculateTravelTime(location, currentDestination, location.getSpeed());
 
                             // Log the GPS being recommended to turn off.
                             try {
@@ -1578,9 +1585,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     } catch(Exception e) {
 
                                     }
-                                    //Calculate time to the new destination
-                                    float time;
-                                    time = (calcDistance(location, currentDestination) - ACCEPTABLE_DISTANCE_RADIUS) / location.getSpeed();
+                                    // Calculate travel time to the new destination
+                                    float travelTimeToNextDestination = calculateTravelTime(location, currentDestination, location.getSpeed());
+
                                     try {
                                         Date now = new Date();
                                         String logString = "LOC_OFF|" + location.getLatitude() + "|" + location.getLongitude() + "|" + now.toString()  +"\n";
@@ -1588,7 +1595,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     } catch(Exception e) {
 
                                     }
-                                    decideShouldGPSTurnOff(time, location);
+                                    decideShouldGPSTurnOff(travelTimeToNextDestination, location);
                                 }
                             }
                             //If we're gaining distance by more than a meter
