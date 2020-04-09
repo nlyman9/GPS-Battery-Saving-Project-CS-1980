@@ -33,18 +33,28 @@ public class WazeScraper {
 	public static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36";
 	//"https://www.waze.com/RoutingManager/routingRequest?at=0&clientVersion=4.0.0&from=x:-79.9541667 y:40.4425&nPaths=3&options=AVOID_TRAILS:t,ALLOW_UTURNS:t&returnGeometries=true&returnInstructions=true&returnJSON=true&timeout=60000&to=x:-79.9564292 y:40.441541"
 	
-	public static final String WEB_URL = String.format(REQUEST_URL_FORMAT_STRING, FROM_LONGITUDE, FROM_LATITUDE, TO_LONGITUDE, TO_LATITUDE); 
-	public static final String REFERRER_URL = String.format(REFERRER_FORMAT_STRING, TO_LATITUDE, TO_LONGITUDE);
 	
-	// Given a to and from latitude/longitude tuple, returns the expected travel time.
-	public static long getTravelTime(String toLatitude, String toLongitude, String fromLatitude, String fromLongitude) {
+	/**
+	 * 
+	 * Given start and end coordinates, queries the Waze routing servers for estimated time of arrival.
+	 * 
+	 * @param toLatitude latitude String of end point
+	 * @param toLongitude longitude String of end point
+	 * @param fromLatitude latitude String of start point
+	 * @param fromLongitude longitude String of end point
+	 * @return travel time on success, -1 on failure
+	 */
+	public static float getTravelTime(String toLatitude, String toLongitude, String fromLatitude, String fromLongitude) {
+		String webURL = String.format(REQUEST_URL_FORMAT_STRING, fromLongitude, fromLatitude, toLongitude, toLatitude); 
+		String referrerURL = String.format(REFERRER_FORMAT_STRING, toLatitude, toLongitude);
+		
 		try {
 			// Connect to the web page.
-			Document document = Jsoup.connect(WEB_URL)
+			Document document = Jsoup.connect(webURL)
 									 .header("accept-encoding", "gzip, deflate, br")
 									 .header("accept-language", "en-US,en;q=0.9")
 									 .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36")
-				      				 .referrer(REFERRER_URL)
+				      				 .referrer(referrerURL)
 				      				 .get();
 			
 			// Parse the JSON response to get the total route time out of the trip.
@@ -53,7 +63,7 @@ public class WazeScraper {
 			JsonObject obj = parser.parse(json).getAsJsonObject();
 			JsonObject response = obj.getAsJsonObject("response");
 			JsonPrimitive totalRouteTime = response.getAsJsonPrimitive("totalRouteTime");
-			return totalRouteTime.getAsLong();
+			return totalRouteTime.getAsFloat();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -62,6 +72,8 @@ public class WazeScraper {
 	
 	
 	public static void main(String[] args) {
+		String WEB_URL = String.format(REQUEST_URL_FORMAT_STRING, FROM_LONGITUDE, FROM_LATITUDE, TO_LONGITUDE, TO_LATITUDE); 
+		String REFERRER_URL = String.format(REFERRER_FORMAT_STRING, TO_LATITUDE, TO_LONGITUDE);
 		try {
 			// Connect to the webpage.
 			Document document = Jsoup.connect(WEB_URL)
