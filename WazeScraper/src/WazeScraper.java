@@ -3,10 +3,6 @@ import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
@@ -53,7 +49,7 @@ public class WazeScraper {
 			Document document = Jsoup.connect(webURL)
 									 .header("accept-encoding", "gzip, deflate, br")
 									 .header("accept-language", "en-US,en;q=0.9")
-									 .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36")
+									 .userAgent(USER_AGENT)
 				      				 .referrer(referrerURL)
 				      				 .get();
 			
@@ -66,50 +62,13 @@ public class WazeScraper {
 			return totalRouteTime.getAsFloat();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return -1;
 		}
-	return -1;
 	}
 	
 	
 	public static void main(String[] args) {
-		String WEB_URL = String.format(REQUEST_URL_FORMAT_STRING, FROM_LONGITUDE, FROM_LATITUDE, TO_LONGITUDE, TO_LATITUDE); 
-		String REFERRER_URL = String.format(REFERRER_FORMAT_STRING, TO_LATITUDE, TO_LONGITUDE);
-		try {
-			// Connect to the webpage.
-			Document document = Jsoup.connect(WEB_URL)
-									 .header("accept-encoding", "gzip, deflate, br")
-									 .header("accept-language", "en-US,en;q=0.9")
-									 .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36")
-				      				 .referrer(REFERRER_URL)
-				      				 .get();
-			
-			String json = document.body().text();
-			
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-											    
-			System.out.println(json);
-						
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(json).getAsJsonObject();
-			JsonObject response = obj.getAsJsonObject("response");
-			JsonPrimitive totalRouteTime = response.getAsJsonPrimitive("totalRouteTime");
-			System.out.println(totalRouteTime);
-			JsonArray results = response.getAsJsonArray("results");
-			
-			for (JsonElement result : results) {
-				System.out.println(result);
-				JsonObject resultObject = result.getAsJsonObject();
-				JsonObject path = resultObject.getAsJsonObject("path");
-
-				System.out.println(path);
-			}
-
-
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		System.out.println(getTravelTime(TO_LATITUDE, TO_LONGITUDE, FROM_LATITUDE, FROM_LONGITUDE));
 	}
 
 }

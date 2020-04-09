@@ -1476,14 +1476,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return 0f;
     }
 
+    /**
+     * Calculates the travel time from the current location to destination and returns it as a float.
+     *
+     * @param currentLoc the current location
+     * @param currentDestination the current destination
+     * @param currentSpeed the current speed (unused in Waze mode)
+     * @return travel time as a float in seconds
+     */
     private float calculateTravelTime(Location currentLoc, Location currentDestination, float currentSpeed) {
+        float travelTime = -1;
+
         if (MainActivity.WazeMode) {
-            // Calculate using waze.
-            return 0f;
-        } else {
-            // We aren't in Waze mode, so use distance divided by speed.
-            return (calcDistance(currentLoc, currentDestination) - ACCEPTABLE_DISTANCE_RADIUS) / currentSpeed;
+            // Calculate using Waze.
+            String toLatitude = Double.toString(currentDestination.getLatitude());
+            String toLongitude = Double.toString(currentDestination.getLongitude());
+            String fromLatitude = Double.toString(currentLoc.getLatitude());
+            String fromLongitude = Double.toString(currentLoc.getLongitude());
+
+            travelTime = WazeWhisperer.getTravelTime(toLatitude, toLongitude, fromLatitude, fromLongitude);
+            if (travelTime == -1) {
+                // Waze failed to get travel time.
+            }
         }
+
+        // Check if Waze mode failed or if we aren't in Waze mode.
+        if (travelTime == -1) {
+            // Either we aren't in Waze mode or Waze mode failed, so use distance divided by speed.
+            travelTime = (calcDistance(currentLoc, currentDestination) - ACCEPTABLE_DISTANCE_RADIUS) / currentSpeed;
+        }
+
+        return travelTime;
     }
 
     /**
