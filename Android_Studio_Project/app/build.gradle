@@ -24,7 +24,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.gps.gpsoptimizationproject"
-        minSdkVersion 26
+        minSdkVersion 22
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -40,6 +40,10 @@ android {
     applicationVariants.all { variant ->
         variant.buildConfigField "String", "API_KEY", getApiKey() // Provides key for the Navigation SDK
         variant.resValue "string", "API_KEY", getApiKey()         // Provides key for the MapView used in app layouts
+    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
     }
 }
 

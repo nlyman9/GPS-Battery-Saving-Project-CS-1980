@@ -19,6 +19,8 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
     static LocationListener templistener;
     static LocationManager GPSDetector;
@@ -40,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         GPSText = findViewById(R.id.GPSStatus);
 
+        //Grant root permission
+        try {
+            Process p = Runtime.getRuntime().exec("su");
+        }
+        catch (IOException e){
+            //Not rooted Oops
+        }
         final TextView gpsIndicator = (TextView) findViewById(R.id.GPSindicator);
         MainText = findViewById(R.id.MainTextView);
         //Making the button do something

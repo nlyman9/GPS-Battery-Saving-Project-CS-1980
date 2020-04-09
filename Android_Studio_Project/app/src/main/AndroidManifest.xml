@@ -49,8 +49,8 @@
         android:protectionLevel="signature"/>
     <uses-permission android:name="com.gps.gpsoptimizationproject.permission.MAPS_RECEIVE"/>
     <!--     The permissions that supposedly allow you to enable and disable GPS location -->
-    <!--<uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" /> -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
