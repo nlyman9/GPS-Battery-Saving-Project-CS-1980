@@ -2,15 +2,11 @@ package com.gps.gpsoptimizationproject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.app.Application;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -20,7 +16,6 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -38,19 +33,14 @@ import com.mapquest.navigation.location.LocationProviderAdapter;
 import com.mapquest.navigation.model.Shape;
 import com.mapquest.navigation.model.location.Destination;
 
-import com.mapquest.navigation.NavigationManager;
-import com.mapquest.navigation.dataclient.RouteService;
 import com.mapquest.navigation.dataclient.listener.RoutesResponseListener;
-import com.mapquest.navigation.location.LocationProviderAdapter;
 import com.mapquest.navigation.model.RouteOptionType;
 import com.mapquest.navigation.model.SystemOfMeasurement;
 import com.mapquest.navigation.model.location.Coordinate;
 import com.mapquest.navigation.model.Route;
 import com.mapquest.navigation.model.RouteLeg;
 import com.mapquest.navigation.model.RouteOptions;
-import com.mapquest.navigation.model.location.Destination;
 
-import android.app.Application;
 import android.widget.Toast;
 
 import java.io.File;
@@ -58,7 +48,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -80,10 +69,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Location currentLocation = new Location("");
     private GoogleMap mMap;
     LocationManager LocM;
-    LocationListener newlistener;
+    LocationListener locationListener;
     TextView velocitydisplay, distancedisplay, timedisplay;
     // current point in list
-    Location destination;
+    Location currentDestination;
     //MapQuest Variables
     LocationProviderAdapter mLocationProviderAdapter;
     RouteService mRouteService;
@@ -97,13 +86,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<Location> staticRoute;
     ArrayList<Location> dynamicRoute;
     int ListI = 0;
-    boolean navigation = false, logGPSOnLatLng = false, testOvershot = false, firstOvershot=false;
+    boolean isInNavigationMode = false;
+    boolean logGPSOnLatLng = false;
+    boolean shouldTestOvershot = false;
+    boolean firstOvershot = false;
     Marker destMarker;
     File logfile = null;
     FileOutputStream fos = null;
     String beforeEnable = "";
     Runnable GPSON = null;
-    Handler h = new Handler();
+    Handler handler = new Handler();
     float firstDistance;
     // object used to get battery level
     BatteryManager bm;
@@ -166,8 +158,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         distbut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            navigation = !navigation;
-            if(navigation) {
+            isInNavigationMode = !isInNavigationMode;
+            if(isInNavigationMode) {
                 try {
                     //Log when the user starts the navigational app
                     Date now = new Date();
@@ -183,9 +175,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 distancedisplay.setText("0 m");
                 timedisplay.setText("0 s");
                 //Acquire the new destination
-                destination = staticRoute.get(ListI);
+                currentDestination = staticRoute.get(ListI);
                 //Add it to the map
-                LatLng destLL = new LatLng(destination.getLatitude(),destination.getLongitude());
+                LatLng destLL = new LatLng(currentDestination.getLatitude(), currentDestination.getLongitude());
                 MarkerOptions destMarkerOptions = new MarkerOptions().position(destLL).title("Next Destination").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                 //Add it to the map and save it in an object that we can use to remove it
                 destMarker = mMap.addMarker(destMarkerOptions);
@@ -212,12 +204,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LocM = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         try {
             //LocM.requestSingleUpdate(LocationManager.GPS_PROVIDER, null);
-            LocM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, newlistener);
+            LocM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
         } catch (SecurityException e) {
             velocitydisplay.setText(e.getMessage());
         }
-        //create a new Runnable that will call the turn GPS On method after a certain amount of time 
-        // that is inserted into the handler
+
+        // Creates a new Runnable that will turn the GPS back on for us when invoked.
         GPSON = new Runnable() {
             @Override
             public void run() {
@@ -1444,6 +1436,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } 
     }
 
+
+    /**
+     * Given two locations, calculates the distance between the two.
+     *
+     * @param cur current location
+     * @param dest destination location
+     * @return
+     */
     private float calcDistance(Location cur, Location dest) {
         try {
             if(cur == null) {
@@ -1461,69 +1461,98 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return 0f;
     }
 
-    //This function creates a location listener which handles detecting location changes - we don't have a need 
-    // for the other functions as they are not as efficient as we want them to be and don't do what we need them to do
+    /**
+     * This function creates a location listener that enables us to perform events on location
+     * changes.
+     */
     private void setNewLocationListener() {
-        newlistener = new LocationListener() {
+        // Create the location listener.
+        locationListener = new LocationListener() {
+
+
+            /**
+             * Called whenever the location changes. We use this as the workhorse of our GPS
+             * navigator.
+             *
+             * @param location a parameter supplied by the application of the current location.
+             */
             @Override
             public void onLocationChanged(Location location) {
                 currentLocation = location;
-                velocitydisplay.setText("Trying to get velocity");
+
+                velocitydisplay.setText("Trying to acquire speed");
+
+                // Check if we are able to acquire the speed from the Location object supplied to
+                // us.
                 if(location.hasSpeed()) {
+                    // Update our display with the current speed.
                     velocitydisplay.setText(location.getSpeed() + " m/s");
-                    //If we are navigating - calculate distance to the next destination
-                    if(navigation) {
-                        float time = calcDistance(location, destination) / location.getSpeed();
+
+                    // If we are currently in navigation mode, calculate distance to the next destination
+                    if(isInNavigationMode) {
+                        float time = calcDistance(location, currentDestination) / location.getSpeed();
                         timedisplay.setText(time + "s");
                         try {
                             Date now = new Date();
                             int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-                            String logString = "CUR_LOC | " + now.toString() + " | " + batLevel + "% | " + location.getLatitude() + " | " + location.getLongitude() + " | " + location.getSpeed() + "m/s | " + location.distanceTo(destination) + "m" + "\n";
+                            String logString = "CUR_LOC | " + now.toString() + " | " + batLevel + "% | " + location.getLatitude() + " | " + location.getLongitude() + " | " + location.getSpeed() + "m/s | " + location.distanceTo(currentDestination) + "m" + "\n";
                             fos.write(logString.getBytes());
                         } catch(Exception e) {
                             logGPSOnLatLng = true;
                         }
                     }
                 }
-                if(navigation) {
 
-                    if(location.distanceTo(destination) <= RADIUS) {
-                        //We reached the destination radius - no need to test if we overshot the coordinate
-                        testOvershot = false;
-                        //We have reached our destination set a new destination
-                        if(setDestination()) {
-                            //Calculate time to the new destination
-                            float time;
-                            time = (calcDistance(location, destination) - RADIUS) / location.getSpeed();
+                if(isInNavigationMode) {
+                    // Check if we've arrived at the current destination (if it's within a
+                    // specified radius).
+                    if(location.distanceTo(currentDestination) <= RADIUS) {
+
+                        // We reached the destination radius - no need to test if we accidentally
+                        // overshot the coordinate
+                        shouldTestOvershot = false;
+
+                        // We have reached our destination, so set a new destination.
+                        if(setNextDestination()) {
+                            // Calculate travel time to the new destination
+                            // TODO: Plug in Waze right here
+                            float travelTimeToNextDestination;
+                            travelTimeToNextDestination = (calcDistance(location, currentDestination) - RADIUS) / location.getSpeed();
+
+                            // Log the GPS being recommended to turn off.
                             try {
                                 Date now = new Date();
                                 int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
                                 String logString = "LOC_OFF | " + now.toString() + " | " + batLevel + "% | " + location.getLatitude() + " | " + location.getLongitude() + "\n";
                                 fos.write(logString.getBytes());
                             } catch(Exception e) {
-
                             }
-                            calcGPSTurnOff(time, location);
+
+                            // Call a method to decide if we have enough time to turn off and
+                            // regain a GPS lock, or if we should just wait out the maneuver.
+                            decideShouldGPSTurnOff(travelTimeToNextDestination, location);
                         }
                     }
-                    //We are not within the target destination - see if we need to test for overshooting
-                    else if(testOvershot) {
-                        //Acquire the first distance to destination (next point in the list)
+                    // We are not within the target destination's radius. Check if we need to test
+                    // for overshooting.
+                    else if(shouldTestOvershot) {
+                        // Acquire the first distance to destination (next point in the list)
                         // and use that to determine if we overshot our destination
                         if(firstOvershot) {
-                            firstDistance = location.distanceTo(destination);
+                            firstDistance = location.distanceTo(currentDestination);
                             firstOvershot = false;
                         }
-                        //We have a first distance and the location changed again - measure
+
+                        // We have a first distance and the location changed again - measure
                         else {
                             //Get the current distance
-                            float curDistance = location.distanceTo(destination);
+                            float curDistance = location.distanceTo(currentDestination);
                             //Since the users' location fluctuates ever so slightly even when they're standing still - we have to account for that, can't blindly compare if one is greater than the other
                             //If the distance changed more than 5 meters - a significant change
                             if(curDistance - firstDistance > 5f){
-                                testOvershot = false;
+                                shouldTestOvershot = false;
                                 //We overshot our destination since we increased distance by meters - acquire the next intersection
-                                if(setDestination()) {
+                                if(setNextDestination()) {
                                     //Log that we over shot and by how many meters
                                     try {
                                         Date now = new Date();
@@ -1535,7 +1564,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
                                     //Calculate time to the new destination
                                     float time;
-                                    time = (calcDistance(location, destination) - RADIUS) / location.getSpeed();
+                                    time = (calcDistance(location, currentDestination) - RADIUS) / location.getSpeed();
                                     try {
                                         Date now = new Date();
                                         String logString = "LOC_OFF|" + location.getLatitude() + "|" + location.getLongitude() + "|" + now.toString()  +"\n";
@@ -1543,13 +1572,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     } catch(Exception e) {
 
                                     }
-                                    calcGPSTurnOff(time, location);
+                                    decideShouldGPSTurnOff(time, location);
                                 }
                             }
                             //If we're gaining distance by more than a meter
                             else if(curDistance - firstDistance < -5f) {
                                 //Just end the testing here - we're still moving closer to the destination so we did not overshoot
-                                testOvershot = false;
+                                shouldTestOvershot = false;
                             }
                             //If neither of those occurred - do nothing - keep measuring the distance
                         }
@@ -1586,13 +1615,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         };
     }
 
-    //A function for handling the acquisition of the next position in a route
-    private boolean setDestination() {
+    /**
+     * This function handles setting the next destination of a route. If the final destination has
+     * been reached, it stops navigation.
+     *
+     * @return true if another destination was set, false if navigation is done
+     */
+    private boolean setNextDestination() {
         ListI++;
         //Check if the user reached their destination
         if(ListI == staticRoute.size()) {
             destMarker.remove();
-            navigation = false;
+            isInNavigationMode = false;
             ListI = 0;
             //Set the two text boxes relevant only to a destination to off
             distancedisplay.setText("");
@@ -1612,9 +1646,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Remove the current marker from the map
             destMarker.remove();
             // get the next destination
-            destination = staticRoute.get(ListI);
+            currentDestination = staticRoute.get(ListI);
             //Create a marker at that point
-            LatLng destLL = new LatLng(destination.getLatitude(),destination.getLongitude());
+            LatLng destLL = new LatLng(currentDestination.getLatitude(), currentDestination.getLongitude());
             MarkerOptions destMarkerOptions = new MarkerOptions().position(destLL).title("Next Destination").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             //Add it to the map and save it in an object that we can use to remove it
             destMarker = mMap.addMarker(destMarkerOptions);
@@ -1622,7 +1656,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void calcGPSTurnOff(float time, Location location) {
+    private void decideShouldGPSTurnOff(float time, Location location) {
         float turnOffTime = time - STDTIMEALLOWANCE;
         //If the odds of getting a new fix are lower than we like, don't bother shutting it off at all
         if(turnOffTime <= 0) {
@@ -1665,8 +1699,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             //Convert from seconds to milliseconds for the runnable
             long milliseconds = (long)(turnOffTime * 1000);
+
             //Call the GPS ON Method after
-            h.postDelayed(GPSON, milliseconds);
+            handler.postDelayed(GPSON, milliseconds);
         }
     }
 
@@ -1699,7 +1734,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             velocitydisplay.setText(e.getMessage());
         }
         logGPSOnLatLng = true;
-        testOvershot = true;
+        shouldTestOvershot = true;
         firstOvershot = true;
     }
 
@@ -1745,25 +1780,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    // method to actually GPS on when not exclusively logging
+    /**
+     *
+     * This method is a wrapper to our function to turn the GPS on. We accomplish this by manipulating
+     * the settings.
+     *
+     * @param context the Context object of the application
+     */
     private void turnGPSOn(Context context) {
+
+        // Turn on the GPS.
         try {
             Settings.Secure.putString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED, "network,gps");
         } catch(Exception e) {
             velocitydisplay.setText(e.getMessage());
         }
+
+        // Log the GPS turning on.
         Date now = new Date();
         int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        // we have turned the GPS on but haven't necessarily acquired a signal yet
+
+        // We have turned the GPS on, but haven't necessarily acquired a lock with a satellite yet.
         String logString = "GPS_ON | " + now.toString() + " | " + batLevel + "%" + "\n";
+
         try {
             fos.write(logString.getBytes());
         } catch(Exception e) {
             velocitydisplay.setText(e.getMessage());
         }
+
         //We set the GPS to on, get the first coordinates that we can
         logGPSOnLatLng = true;
-        testOvershot = true;
+        shouldTestOvershot = true;
         firstOvershot = true;
     }
 
