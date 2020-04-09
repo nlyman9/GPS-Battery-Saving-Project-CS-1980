@@ -36,10 +36,10 @@ public class WazeScraper {
 	public static final String WEB_URL = String.format(REQUEST_URL_FORMAT_STRING, FROM_LONGITUDE, FROM_LATITUDE, TO_LONGITUDE, TO_LATITUDE); 
 	public static final String REFERRER_URL = String.format(REFERRER_FORMAT_STRING, TO_LATITUDE, TO_LONGITUDE);
 	
-	// Given a to and from latitude/longitude touple, returns the expected travel time.
+	// Given a to and from latitude/longitude tuple, returns the expected travel time.
 	public static long getTravelTime(String toLatitude, String toLongitude, String fromLatitude, String fromLongitude) {
 		try {
-			// Connect to the webpage.
+			// Connect to the web page.
 			Document document = Jsoup.connect(WEB_URL)
 									 .header("accept-encoding", "gzip, deflate, br")
 									 .header("accept-language", "en-US,en;q=0.9")
