@@ -36,6 +36,11 @@ android {
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
     applicationVariants.all { variant ->
         variant.buildConfigField "String", "API_KEY", getApiKey() // Provides key for the Navigation SDK

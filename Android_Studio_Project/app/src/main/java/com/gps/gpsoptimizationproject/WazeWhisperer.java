@@ -12,6 +12,7 @@ public class WazeWhisperer {
     public static final String REQUEST_URL_FORMAT_STRING = "https://www.waze.com/RoutingManager/routingRequest?at=0&clientVersion=4.0.0&from=x:%s y:%s&nPaths=3&options=AVOID_TRAILS:t,ALLOW_UTURNS:t&returnGeometries=true&returnInstructions=true&returnJSON=true&timeout=60000&to=x:%s y:%s";
     public static final String REFERRER_FORMAT_STRING = "https://www.waze.com/livemap/directions?utm_campaign=waze_website&utm_source=waze_website&to=ll.%s,%s";
     public static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36";
+    private static final String TAG = "MyActivity";
 
     /**
      *
@@ -38,9 +39,19 @@ public class WazeWhisperer {
 
             // Parse the JSON response to get the total route time out of the trip.
             String json = document.body().text();
+            Log.d(TAG, "Waze response JSON: \n" + json);
             JsonParser parser = new JsonParser();
             JsonObject obj = parser.parse(json).getAsJsonObject();
+            // Make sure we have the response field
+            if (!obj.has("response")) {
+                Log.d(TAG, "Waze response doesn't have response field, returning -1");
+                return -1;
+            }
             JsonObject response = obj.getAsJsonObject("response");
+            if(!response.has("totalRouteTime")) {
+                Log.d(TAG, "Waze response doesn't have totalRouteTime field, returning -1");
+                return -1;
+            }
             JsonPrimitive totalRouteTime = response.getAsJsonPrimitive("totalRouteTime");
             return totalRouteTime.getAsFloat();
         } catch (IOException e) {
