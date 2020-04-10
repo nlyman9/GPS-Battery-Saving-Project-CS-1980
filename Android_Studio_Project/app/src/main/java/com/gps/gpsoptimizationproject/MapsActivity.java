@@ -16,6 +16,7 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -1486,6 +1487,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     private float calculateTravelTime(Location currentLoc, Location currentDestination, float currentSpeed) {
         float travelTime = -1;
+        Log.d(TAG, String.format("Calculating travel time for (%f, %f) to (%f, %f)", currentLoc.getLatitude(), currentLoc.getLongitude(), currentDestination.getLatitude(), currentDestination.getLongitude()));
 
         if (MainActivity.WazeMode) {
             // Calculate using Waze.
@@ -1497,6 +1499,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             travelTime = WazeWhisperer.getTravelTime(toLatitude, toLongitude, fromLatitude, fromLongitude);
             if (travelTime == -1) {
                 // Waze failed to get travel time.
+                Log.d(TAG, "Error getting travel time from Waze!");
+            } else {
+                Log.d(TAG, "Waze returned travel time of " + travelTime);
             }
         }
 

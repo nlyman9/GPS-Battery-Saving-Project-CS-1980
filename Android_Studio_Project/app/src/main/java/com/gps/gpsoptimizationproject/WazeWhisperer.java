@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import android.util.Log;
 
 public class WazeWhisperer {
     public static final String REQUEST_URL_FORMAT_STRING = "https://www.waze.com/RoutingManager/routingRequest?at=0&clientVersion=4.0.0&from=x:%s y:%s&nPaths=3&options=AVOID_TRAILS:t,ALLOW_UTURNS:t&returnGeometries=true&returnInstructions=true&returnJSON=true&timeout=60000&to=x:%s y:%s";
