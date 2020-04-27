@@ -42,7 +42,7 @@
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="map_key" />
+            android:value="AIzaSyCwZDeqfPoyrUTWTQLgQGIyyhLXJGZazL4" />
     </application>
     <permission
         android:name="com.gps.gpsoptimizationproject.permission.MAPS_RECEIVE"

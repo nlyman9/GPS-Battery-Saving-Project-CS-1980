@@ -13,11 +13,11 @@ allprojects {
         }
     }
 }
-
+//This is for getting the MapQuest key
 def getApiKey() {
-    //def props = new Properties()
-    //file("mapquest.properties").withInputStream { props.load(it) }
-    return "\"" + "sAfcOftVjB5IiEAGADgMglDK9lV8PKKA" + "\"" //props.getProperty("api_key") + "\""
+    def props = new Properties()
+    file("mapquest.properties").withInputStream { props.load(it) }
+    return "\"" + props.getProperty("api_key") + "\""
 }
 
 android {

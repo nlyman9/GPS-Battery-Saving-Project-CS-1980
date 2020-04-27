@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -165,9 +166,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         FloatingActionButton distbut = findViewById(R.id.dist);
         staticRoute = new ArrayList<Location>();
+        dynamicRoute = new ArrayList<Location>();
         Bundle extras = getIntent().getExtras();
         boolean select = extras.getBoolean("routeSelect");
-
+        //create a dynamic route via MapQuest
+        getMapQuestRoute();
+        //This creates routes not via MapQuest
         if(select == true) {
             createHomeRoute();
         } else {
@@ -201,6 +205,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MarkerOptions destMarkerOptions = new MarkerOptions().position(destLL).title("Next Destination").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                 //Add it to the map and save it in an object that we can use to remove it
                 destMarker = mMap.addMarker(destMarkerOptions);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(destLL));
             } else {
                 //We disabled navigation - remove the current marker
                 destMarker.remove();
@@ -240,22 +245,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         };
-
-        startMapQuestNavigation();
     }
 
-    private void startMapQuestNavigation() {
+    private void getMapQuestRoute() {
         //Boilerplate Objects
         mRouteService = new RouteService.Builder().build(getApplicationContext(), BuildConfig.API_KEY);
         mLocationProviderAdapter = ((MQNavigationSampleApplication) getApplication()).getLocationProviderAdapter();
+        //This wasn't working and we don't need a navigation manager in this case anyways, because we are just generating a route between two coordinates
         //mNavigationManager = new NavigationManager.Builder(this, BuildConfig.API_KEY, mLocationProviderAdapter).build();
 
         // Set up start and destination for the route
         //TODO convert the start coordinate to a current location access
-        Coordinate nyc = new Coordinate(40.7326808, -73.9843407);
-        Coordinate boston = new Coordinate(42.355097, -71.055464);
-        dest.add(new Destination(boston, null));
-
+        //This startCoordinate is in nyc
+        Coordinate startCoordinate = new Coordinate(40.7326808, -73.9843407);
+        //This endCoordinate is in boston
+        Coordinate endCoordinate = new Coordinate(42.355097, -71.055464);
+        //Add the end coordinate to the destination list
+        dest.add(new Destination(endCoordinate, null));
         // Set up route options
         RouteOptions routeOptions = new RouteOptions.Builder()
                 .maxRoutes(3)
@@ -269,26 +275,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .seasonalClosures(RouteOptionType.AVOID)
                 .build();
         RoutesResponseListener responseListener = new RoutesResponseListener() {
+            //This retrieves the route
             @Override
             public void onRoutesRetrieved(@NonNull List<Route> routes) {
                 if (routes.size() > 0) {
+                    //Don't start the navigation, because we don't need to
                     //mNavigationManager.startNavigation((Route) routes.get(0));
                     Route mRoute = routes.get(0);
                     List<RouteLeg> legs = mRoute.getLegs();
                     //System.out.println("Length of legs: " + legs.size());
                     RouteLeg onlyLeg = legs.get(0);
                     Shape s = onlyLeg.getShape();
+                    //This gets the coordinate list
                     List<Coordinate> coords = s.getCoordinates();
-                    int count = 0;
+                    System.out.println("There are: " + coords.size() + "coordinates in this route");
                     // Print out the list of coordinates for the route from nyc to boston.
                     // Almost 4,000(!!!) coordinates returned from this
                     // It does not return a coordinate for each turn, clearly
+
                     for (Coordinate coord : coords) {
-                        System.out.println("Coord: " + count);
-                        System.out.println("Latitude: " + coord.getLatitude());
-                        System.out.println("Longitude: " + coord.getLongitude());
-                        count++;
+                        Location newLoc = new Location("");
+                        newLoc.setLatitude(coord.getLatitude());
+                        newLoc.setLongitude(coord.getLongitude());
+                        dynamicRoute.add(newLoc);
                     }
+
+                }
+                else {
+                    System.out.println("No routes found for these coordinates");
                 }
             }
 
@@ -302,9 +316,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         };
-        mRouteService.requestRoutes(nyc, dest, routeOptions, responseListener);
-
-
+        mRouteService.requestRoutes(startCoordinate, dest, routeOptions, responseListener);
     }
 
     //creates route to Pitt
