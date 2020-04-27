@@ -19,6 +19,8 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
     static LocationListener templistener;
     static LocationManager GPSDetector;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     static TextView MainText;
     static TextView GPSText;
     static String Transportation;
+    static boolean WazeMode = false;
     static boolean route = false;
     // provides buttons for Matt route select
     final static boolean Matt = true;
@@ -40,6 +43,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         GPSText = findViewById(R.id.GPSStatus);
 
+        //Grant root permission
+        try {
+            Process p = Runtime.getRuntime().exec("su");
+        }
+        catch (IOException e){
+            //Not rooted Oops
+        }
         final TextView gpsIndicator = (TextView) findViewById(R.id.GPSindicator);
         MainText = findViewById(R.id.MainTextView);
         //Making the button do something
@@ -51,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
         Button pitt71 = findViewById(R.id.pitt71);
         Button homebus = findViewById(R.id.homebus);
         Button customButton = findViewById(R.id.customButton);
+
+        // Waze mode variables
+        Button wazeButton = findViewById(R.id.wazeButton);
+        TextView wazeModeStatus = (TextView) findViewById(R.id.wazeModeStatus);
+
 
         gpsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +80,21 @@ public class MainActivity extends AppCompatActivity {
                     gpsIndicator.setText("GPS OFF");
                     turnGPSOff(getApplicationContext());
                 }
+            }
+        });
+
+        // Toggle Waze status.
+        wazeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WazeMode = !WazeMode;
+                if (WazeMode){
+                    wazeModeStatus.setText("Waze Mode: on");
+
+                }  else {
+                    wazeModeStatus.setText("Waze Mode: off");
+                }
+
             }
         });
 

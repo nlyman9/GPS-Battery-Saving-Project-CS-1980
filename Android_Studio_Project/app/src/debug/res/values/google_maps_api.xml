@@ -22,5 +22,5 @@
     -->
     <!--Notes from Matt- the api key is under my personal Google Account. I have removed my API key to prevent any future issues.
     Follow the above instructions to get your own-->
-    <string name="map_key" templateMergeStrategy="preserve" translatable="false"></string>
+    <string name="map_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBSCk3vh8l5dmRAVYTfQ9m80Wb8CAAVJ7M</string>
 </resources>
