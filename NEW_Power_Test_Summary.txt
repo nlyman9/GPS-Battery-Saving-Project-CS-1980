@@ -1,0 +1,29 @@
+*** Results of the total amperage and wattage of the tests with and without the GPS toggled can be found in the document "NEW_Power_test.txt". *** 	\
+(Can be found in GPS Project Google Drive Files zip)
+
+The Excel document, "NEW_Power_Test_Results.xlsx", contains two parts to it.
+Firstly, the data points and resulting graphs from battery trials 2-6 are kept here. These tests adjust a variety of parameters while comparing the power consumption and usage of the phone while the GPS is on vs. when the GPS is off. These parameters are described in "NEW_Power_test.txt" and are repeated here for convenience.
+
+Trial 1: GPS On, Screen On, Power consumption over 10 minutes
+Trial 2: GPS On, Screen On, Power consumption over 5 minutes
+Trial 3: GPS On, Screen On, Power consumption over 1 minute
+Trial 4: GPS Off, Screen On, Power consumption over 10 minutes
+Trial 5: GPS Off, Screen On, Power consumption over 5 minutes
+Trial 6: GPS Off, Screen On, Power consumption over 1 minute
+
+The data for these trials are found in "NEW_Power_test.txt".
+The graphs and data points for these trials were imported directly from a companion application for the USB Power Meter. Thus, no exact measurement metric was provided. Instead, points are listed only as "Read Times" and are not labelled in terms of what the numbers actually correspond to. Based on the lenghs of the tests and the values of the numbers, it seems that the points correspond to roughly half a second each. Along this scale is plotted the amperage readings from the USB power meter that the phone was drawing. The mean and standard deviation associated with the points is also reported above each graph in each tab of the Excel document. Because of little data being available on the usage of the USB Power Meter, the results seem somewhat less precise than we were hoping, and the biggest drawback is a lack of a precise metric to measure time against. The internal clock of the USB Power Meter seemed to skip around every once in a while, so an external timer was used when performing these tests.
+
+The second half of the Excel document contains the results of the (5) GPS Toggle tests.
+These tests were the result of trying to determine when it is okay to toggle the GPS and if there is any overhead associated with this action. Each test was performed under different parameters in order to attempt to isolate this behavior. The parameters for the tests are listed for convenience below:
+
+Toggle Test 1: Test duration: 1 minute, GPS Toggle Interval: 5 seconds, Location: Idling on main menu of app
+Toggle Test 2: Test duration: 1 minute, GPS Toggle Interval: 5 seconds, Location: Actively in navigation
+Toggle Test 3: Test duration: 1 minute, GPS Toggle Interval: 10 seconds, Location: Actively in navigation
+Toggle Test 4: Test duration: 2 minutes, GPS Toggle Interval: 30 seconds, Location: Actively in navigation
+Toggle Test 5: Test duration: 3 minutes, GPS Toggle Interval: 30 seconds on, 2 minutes off, 30 seconds on, Location: Actively in navigation
+
+The results of these graphs were plotted in an identical way to the previous power trials as described above. Underneath each graph, we listed our observations and reasoning for performing the test, including hypotheses for reasons we got the results that we did.
+
+
+All tests were performed in the same environment while plugged into a laptop for charge and use of the USB Power Meter to instantly transfer data on the same physical device using the same version of the app in order to keep any other variables static and not influence the data we were trying to isolate.
